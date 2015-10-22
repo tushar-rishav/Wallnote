@@ -1,2 +1,2 @@
 # WhiteBoard
-An idea
+Code for Windows system
