@@ -36,7 +36,7 @@ class Wallnote(Config):
 
     def check_escape(self, key):
         """
-                Check if user wants is done taking notes
+                Check if user is done taking notes
         """
         if self.flag and key == "`":
             self.set_pickle(self.data)
