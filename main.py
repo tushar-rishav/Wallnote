@@ -19,6 +19,7 @@ class Wallnote(Config):
     def __init__(self):
         self.data = OrderedDict()
         self.flag = False
+        self.ignore_keys = ["<left ctrl>","<left shift>","<right shift>","<backspace>","<esc>","<enter>","<caps lock>","<right ctrl>"]
         setproctitle('Wallnote')
 
         # load saved data
@@ -39,10 +40,7 @@ class Wallnote(Config):
         """
         if self.flag and key == "`":
             self.set_pickle(self.data)
-            self.flag = False
-
-        else:
-            self.flag = False
+        self.flag = False
 
         if(key == "<esc>"):
             self.flag = True
@@ -51,10 +49,10 @@ class Wallnote(Config):
         """
                 Build the present data using recorded key
         """
-        if self.data.has_key(self.ins_pos):
+        if self.ins_pos in self.data:
             if key == "<enter>":
                 self.data[self.ins_pos] += "\n"
-            elif key != "<backspace>" and key != "<esc>":
+            elif key and key not in self.ignore_keys:
                 self.data[self.ins_pos] += key
         else:
             self.data[self.ins_pos] = key
@@ -103,6 +101,9 @@ class Wallnote(Config):
 
         with open("wallnote.png", "wb") as image_file:
             surf.write_to_png(image_file)
+        path = os.path.join(os.getcwd(), "wallnote.png")
+        os.popen(
+            "gsettings set org.gnome.desktop.background picture-uri file:///{}".format(path))
 
 
 def main():
