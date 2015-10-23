@@ -52,8 +52,10 @@ class Wallnote(Config):
         if self.ins_pos in self.data:
             if key == "<enter>":
                 self.data[self.ins_pos] += "\n"
-            elif key and key not in self.ignore_keys:
+            elif key and not (key in self.ignore_keys):
                 self.data[self.ins_pos] += key
+            if key and key == "<backspace>":
+            	self.data[self.ins_pos] = self.data[self.ins_pos][:-1]
         else:
             self.data[self.ins_pos] = key
 

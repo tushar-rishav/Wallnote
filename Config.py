@@ -1,6 +1,7 @@
 import os
 import sys
 import getpass
+import logging
 if sys.version_info >= (3,):
     import pickle
 else:
