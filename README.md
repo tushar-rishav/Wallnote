@@ -1,4 +1,4 @@
-# WhiteBoard
+# Wallnote
 
 ##### Work under progress
 
@@ -12,6 +12,20 @@ A desktop application that converts your wallpaper into an “editable white boa
 
 ### Usage
 Soon enough!
+
+### To Do
+###### Linux
+- [ ] Add cursor visibility and navigation feature
+- [ ] Add custom wallpapers
+- [ ] Optimise the image rendering
+- [ ] Flexible font-size and alignment option
+- [ ] Write tests 
+
+###### Windows
+- [ ] Enable editing in more real time without using Notepad
+- [x] Add custom wallpapers
+- [x] Flexible font-size and alignment option
+- [ ] Write tests
 
 ### Contributor
 [Harsh Kumar](https://github.com/Harsh50)
