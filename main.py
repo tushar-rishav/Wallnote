@@ -19,7 +19,9 @@ class Wallnote(Config):
     def __init__(self):
         self.data = OrderedDict()
         self.flag = False
-        self.ignore_keys = ["<left ctrl>","<left shift>","<right shift>","<backspace>","<esc>","<enter>","<caps lock>","<right ctrl>"]
+        self.escape = False
+        self.ignore_keys = ["<left ctrl>", "<left shift>", "<right shift>",
+                            "<backspace>", "<esc>", "<enter>", "<caps lock>", "<right ctrl>"]
         setproctitle('Wallnote')
 
         # load saved data
@@ -40,6 +42,8 @@ class Wallnote(Config):
         """
         if self.flag and key == "`":
             self.set_pickle(self.data)
+            self.ins_pos += 1
+            self.escape = True
         self.flag = False
 
         if(key == "<esc>"):
@@ -52,11 +56,19 @@ class Wallnote(Config):
         if self.ins_pos in self.data:
             if key == "<enter>":
                 self.data[self.ins_pos] += "\n"
-            elif key and not (key in self.ignore_keys):
+            elif not(self.escape) and key and not (key in self.ignore_keys):
                 self.data[self.ins_pos] += key
-            if key and key == "<backspace>":
-            	self.data[self.ins_pos] = self.data[self.ins_pos][:-1]
-        else:
+            elif key and key == "<backspace>":
+                if len(self.data[self.ins_pos]):
+                    self.data[self.ins_pos] = self.data[
+                        self.ins_pos][:-1]  # Clear current line
+                elif self.ins_pos:
+                    del self.data[self.ins_pos]
+                    self.ins_pos -= 1   # Move to previous line
+
+                else:
+                    pass
+        elif not(self.escape) and key and not (key in self.ignore_keys):
             self.data[self.ins_pos] = key
 
     def read_keys(self, key):
