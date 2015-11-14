@@ -3,6 +3,7 @@
 from collections import OrderedDict
 from Config import Config
 from setproctitle import setproctitle
+from time import sleep
 import keylogger
 import pickle
 import os
@@ -18,7 +19,9 @@ class Wallnote(Config):
 
     def __init__(self):
         self.data = OrderedDict()
-        self.flag = False
+        self.flag_end = True     # default bool for logging hault state
+        self.flag_start = False  # default bool for logging start state
+        self.flag_master = False
         self.escape = False
         self.ignore_keys = ["<left ctrl>", "<left shift>", "<right shift>",
                             "<backspace>", "<esc>", "<enter>", "<caps lock>", "<right ctrl>"]
@@ -34,20 +37,36 @@ class Wallnote(Config):
         else:
             self.ins_pos = 0
         # start recording
-        keylogger.log(self.read_keys)
+        #keylogger.log(self.read_keys)
+        while True:
+            sleep(0.0001)
+            changed, modifiers, keys = keylogger.fetch_keys()
+            if changed:
+                self.read_keys(keys)
 
     def check_escape(self, key):
         """
                 Check if user is done taking notes
         """
-        if self.flag and key == "`":
-            self.set_pickle(self.data)
-            self.ins_pos += 1
-            self.escape = True
-        self.flag = False
-
         if(key == "<esc>"):
-            self.flag = True
+            self.flag_master = True
+            # if self.flag_start:         
+            #     self.flag_end = False
+            # else:
+            #     self.flag_start = True
+        elif self.flag_master and key == "`":
+            if not(self.flag_end) and self.flag_start:
+                self.set_pickle(self.data)   # If script was responding, make it stop responding and save the data
+                self.ins_pos += 1
+                self.flag_end = True
+                self.flag_start = False
+            elif self.flag_end and not(self.flag_start):
+                self.flag_end = False
+                self.flag_start = True     # Start responding
+            self.flag_master = False
+            self.escape = True
+
+        #self.flag_end = True
 
     def insert_data(self, key):
         """
@@ -68,6 +87,8 @@ class Wallnote(Config):
 
                 else:
                     pass
+            else:
+                self.escape = False
         elif not(self.escape) and key and not (key in self.ignore_keys):
             self.data[self.ins_pos] = key
 
@@ -76,8 +97,9 @@ class Wallnote(Config):
                 Record key
         """
         self.check_escape(key)
-        if not self.flag:
+        if self.flag_end:
             self.insert_data(key)
+            self.flag_start
             self.dict_to_text(self.data)
 
     def dict_to_text(self, data):
@@ -116,9 +138,9 @@ class Wallnote(Config):
         with open("wallnote.png", "wb") as image_file:
             surf.write_to_png(image_file)
         path = os.path.join(os.getcwd(), "wallnote.png")
-        os.popen(
+        fd = os.popen(
             "gsettings set org.gnome.desktop.background picture-uri file:///{}".format(path))
-
+        fd.close()
 
 def main():
     note = Wallnote()

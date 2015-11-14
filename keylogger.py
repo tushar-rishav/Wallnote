@@ -201,7 +201,7 @@ def fetch_keys():
 
 
 
-def log(callback, sleep_interval=.005):
+def log(callback, sleep_interval=.0001):
     while True:
         sleep(sleep_interval)
         changed, modifiers, keys = fetch_keys()
@@ -216,4 +216,4 @@ if __name__ == "__main__":
     done = lambda: time() > now + 60
     def print_keys(t, modifiers, keys): print "%.2f   %r   %r" % (t, keys, modifiers)
 
-    log(done, print_keys)
+    log(print_keys)
